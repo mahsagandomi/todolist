@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>ثبت‌نام</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+    <h2>ثبت‌نام کاربر جدید</h2>
+    <form id="registerForm">
+        <label>نام کاربری:</label>
+        <input type="text" id="username" required>
+        <label>رمز عبور:</label>
+        <input type="password" id="password" required>
+        <button type="submit">ثبت‌نام</button>
+    </form>
+    <p id="msg" class="success"></p>
+    <p style="text-align: center; margin-top: 15px;">
+        حساب کاربری دارید؟ <a href="login.html">وارد شوید</a>
+    </p>
+</div>
+
+<script>
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+
+        const res = await fetch("/users", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userName: username, password: password })
+        });
+
+        if (res.ok) {
+            document.getElementById("msg").textContent = "ثبت‌نام موفقیت‌آمیز بود! در حال انتقال...";
+            setTimeout(() => window.location.href = "login.html", 1500);
+        } else {
+            document.getElementById("msg").textContent = "خطا: نام کاربری تکراری است.";
+            document.getElementById("msg").className = "error";
+        }
+    });
+</script>
+</body>
+</html>

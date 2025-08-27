@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>ورود</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+    <h2>ورود به حساب کاربری</h2>
+    <form method="post" action="/login">
+        <label>نام کاربری:</label>
+        <input type="text" id="username" name="username" required>
+        <label>رمز عبور:</label>
+        <input type="password" id="password" name="password" required>
+        <button type="submit">ورود</button>
+    </form>
+    <p class="error" id="errorMsg"></p>
+    <p style="text-align: center; margin-top: 15px;">
+        حساب کاربری ندارید؟ <a href="register.html">ثبت‌نام کنید</a>
+    </p>
+</div>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("error")) {
+        document.getElementById("errorMsg").textContent =
+            "نام کاربری یا رمز عبور اشتباه است.";
+    }
+</script>
+</body>
+</html>

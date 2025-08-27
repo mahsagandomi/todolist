@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت لیست کارها</title>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Vazirmatn', sans-serif;
+            background: linear-gradient(135deg, #89f7fe, #66a6ff);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 50px;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 650px;
+            max-width: 95%;
+            background: #fff;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 15px;
+            border-radius: 12px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #66a6ff;
+            box-shadow: 0 0 8px rgba(102,166,255,0.3);
+        }
+
+        /* 🎨 استایل دکمه‌ها با RGB گرادیانت */
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+            background-size: 200% auto;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            transform: translateY(-3px) scale(1.03);
+            background-position: right center;
+        }
+
+        /* افزودن لیست / آیتم */
+        .btn-add {
+            background-image: linear-gradient(45deg, #00c6ff, #0072ff, #00f2fe);
+        }
+
+        /* حذف */
+        .btn-delete {
+            background-image: linear-gradient(45deg, #ff416c, #ff4b2b, #ff6a00);
+        }
+
+        /* نمایش آیتم‌ها / تغییر وضعیت */
+        .btn-toggle {
+            background-image: linear-gradient(45deg, #43e97b, #38f9d7, #3a7bd5);
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li.list-card {
+            background: #f9f9f9;
+            margin-bottom: 20px;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: 0.3s;
+        }
+
+        li.list-card:hover {
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        li.list-card h2 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            display: inline-block;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        li.item-card {
+            background: #fff;
+            padding: 10px 15px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.2s;
+        }
+
+        li.item-card:hover {
+            background: #f0f0f0;
+        }
+
+        .item-done {
+            text-decoration: line-through;
+            color: gray;
+        }
+
+        .item-input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>مدیریت لیست کارها</h1>
+    <div class="input-group">
+        <input type="text" id="listName" placeholder="نام لیست را وارد کنید">
+        <button class="btn-add" id="addListBtn">افزودن لیست</button>
+    </div>
+    <ul id="todolists"></ul>
+</div>
+
+<script>
+    const todolistsUl = document.getElementById('todolists');
+    const serverUrl = 'http://localhost:8083/todolists';
+    const itemsUrl = 'http://localhost:8083/todo-items';
+
+    function loadLists() {
+        fetch(serverUrl)
+            .then(r => r.json())
+            .then(data => {
+                todolistsUl.innerHTML = '';
+                data.forEach(list => {
+                    const li = document.createElement('li');
+                    li.className = 'list-card';
+
+                    const title = document.createElement('h2');
+                    title.textContent = list.name;
+                    li.appendChild(title);
+
+                    const actions = document.createElement('div');
+                    actions.className = 'actions';
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = '🗑 حذف';
+                    deleteBtn.className = 'btn-delete';
+                    deleteBtn.onclick = () => {
+                        fetch(`${serverUrl}/${list.id}`, { method: 'DELETE' })
+                            .then(resp => { if(resp.ok) loadLists(); });
+                    };
+                    actions.appendChild(deleteBtn);
+
+                    const showItemsBtn = document.createElement('button');
+                    showItemsBtn.textContent = '📋 آیتم‌ها';
+                    showItemsBtn.className = 'btn-toggle';
+                    actions.appendChild(showItemsBtn);
+
+                    li.appendChild(actions);
+
+                    const itemsUl = document.createElement('ul');
+                    li.appendChild(itemsUl);
+
+                    const addItemDiv = document.createElement('div');
+                    addItemDiv.className = 'item-input-group';
+
+                    const addItemInput = document.createElement('input');
+                    addItemInput.placeholder = 'متن آیتم';
+                    addItemDiv.appendChild(addItemInput);
+
+                    const addItemBtn = document.createElement('button');
+                    addItemBtn.textContent = '➕ افزودن آیتم';
+                    addItemBtn.className = 'btn-add';
+                    addItemBtn.onclick = () => {
+                        const title = addItemInput.value.trim();
+                        if(!title) return alert('نام آیتم را وارد کنید');
+                        fetch(`${itemsUrl}/${list.id}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ title })
+                        }).then(resp => {
+                            if(resp.ok){
+                                addItemInput.value = '';
+                                showItemsBtn.click();
+                            }
+                        });
+                    };
+                    addItemDiv.appendChild(addItemBtn);
+                    li.appendChild(addItemDiv);
+
+                    showItemsBtn.onclick = () => {
+                        fetch(`${itemsUrl}/todolist-item/${list.id}`)
+                            .then(r => r.json())
+                            .then(items => {
+                                itemsUl.innerHTML = '';
+                                items.forEach(item => {
+                                    const itemLi = document.createElement('li');
+                                    itemLi.className = 'item-card';
+                                    itemLi.textContent = item.title;
+                                    if(item.isDone) itemLi.classList.add('item-done');
+
+                                    const itemActions = document.createElement('div');
+                                    itemActions.className = 'actions';
+
+                                    const toggleBtn = document.createElement('button');
+                                    toggleBtn.textContent = item.isDone ? '✅' : '❌';
+                                    toggleBtn.className = 'btn-toggle';
+                                    toggleBtn.onclick = () => {
+                                        fetch(`${itemsUrl}/${item.id}/toggle-done`, { method: 'PATCH' })
+                                            .then(resp => {
+                                                if(resp.ok){
+                                                    item.isDone = !item.isDone;
+                                                    itemLi.classList.toggle('item-done');
+                                                    toggleBtn.textContent = item.isDone ? '✅' : '❌';
+                                                }
+                                            });
+                                    };
+                                    itemActions.appendChild(toggleBtn);
+
+                                    const deleteItemBtn = document.createElement('button');
+                                    deleteItemBtn.textContent = '🗑';
+                                    deleteItemBtn.className = 'btn-delete';
+                                    deleteItemBtn.onclick = () => {
+                                        fetch(`${itemsUrl}/${item.id}`, { method: 'DELETE' })
+                                            .then(resp => { if(resp.ok) showItemsBtn.click(); });
+                                    };
+                                    itemActions.appendChild(deleteItemBtn);
+
+                                    itemLi.appendChild(itemActions);
+                                    itemsUl.appendChild(itemLi);
+                                });
+                            });
+                    };
+
+                    todolistsUl.appendChild(li);
+                });
+            });
+    }
+
+    document.getElementById('addListBtn').onclick = () => {
+        const name = document.getElementById('listName').value.trim();
+        if(!name) return alert('نام لیست را وارد کنید');
+        fetch(serverUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name })
+        }).then(resp => {
+            if(resp.ok){
+                document.getElementById('listName').value = '';
+                loadLists();
+            }
+        });
+    };
+
+    loadLists();
+</script>
+</body>
+</html>
