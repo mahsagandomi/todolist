@@ -1,5 +1,6 @@
 package dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
  * Data Transfer Object (DTO) for a single To-Do list item.
  * Contains the ID, title, and completion status of the item.
  */
+@Schema(name = "ToDoListItem", description = "ToDoListItem Dto")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

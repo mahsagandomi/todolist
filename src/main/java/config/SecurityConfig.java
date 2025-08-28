@@ -64,7 +64,14 @@ public class SecurityConfig {
                                 "/register.html",
                                 "/style.css",
                                 "/users",
-                                "/register"
+                                "/register",
+                                "/docs/**",             //  swagger-ui
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+
                         ).permitAll()
                         // All other requests require authentication
                         .anyRequest().authenticated()

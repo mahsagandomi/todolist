@@ -1,6 +1,7 @@
 package dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
  * Data Transfer Object (DTO) for a To-Do list item.
  * Contains the ID and title of a to-do item.
  */
+@Schema(name = "ToDoList", description = "ToDoList dto")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

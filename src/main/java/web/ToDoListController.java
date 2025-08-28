@@ -4,6 +4,12 @@ import dto.ToDoListDto;
 import dto.ToDoListItemDto;
 import exception.ExistException;
 import exception.NotFoundException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import service.ToDoListService;
@@ -31,27 +37,20 @@ public class ToDoListController {
         this.toDoListService = toDoListService;
     }
 
-    /**
-     * Get all ToDo lists for the logged-in user.
-     *
-     * @param principal the currently authenticated user
-     * @return a list of ToDoListDto
-     * @throws NotFoundException if the user does not exist
-     */
+
+    @Operation(summary = "Get all ToDo lists", description = "Retrieve all ToDo lists of the currently authenticated user")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved lists",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ToDoListDto.class))))
     @GetMapping
     public ResponseEntity<List<ToDoListDto>> getAllToDoList(Principal principal) throws NotFoundException {
         String username = principal.getName(); // Get username from token/session
         return ResponseEntity.ok(toDoListService.getAllToDoListByUsername(username));
     }
 
-    /**
-     * Create a new ToDo list for the logged-in user.
-     *
-     * @param toDoListDto DTO containing ToDo list data
-     * @param principal   the currently authenticated user
-     * @return ResponseEntity with success message
-     * @throws ExistException if a list with the same title already exists for the user
-     */
+
+    @Operation(summary = "Create a new ToDo list", description = "Create a new ToDo list for the logged-in user")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "ToDo list created successfully"),
+            @ApiResponse(responseCode = "409", description = "List with the same title already exists")})
     @PostMapping
     public ResponseEntity<String> createToDoList(@RequestBody ToDoListDto toDoListDto, Principal principal) throws ExistException {
         String userName = principal.getName();
@@ -59,27 +58,20 @@ public class ToDoListController {
         return ResponseEntity.ok("to do list added.");
     }
 
-    /**
-     * Delete a ToDo list by its ID.
-     *
-     * @param toDoListId the ID of the list to delete
-     * @return ResponseEntity with success message
-     * @throws NotFoundException if the list does not exist
-     */
+
+    @Operation(summary = "Delete todolist", description = "Delete todolist with todolist id")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "ToDo list deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "List not found")})
     @DeleteMapping("/{toDoListId}")
     public ResponseEntity<String> deleteToDoList(@PathVariable Long toDoListId) throws NotFoundException {
         toDoListService.deleteToDoList(toDoListId);
         return ResponseEntity.ok("deleted.");
     }
 
-    /**
-     * Add an item to a specific ToDo list.
-     *
-     * @param id              the ID of the ToDo list
-     * @param toDoListItemDto DTO containing item data
-     * @return ResponseEntity with success message
-     * @throws NotFoundException if the list does not exist
-     */
+
+    @Operation(summary = "Add item to a ToDo list", description = "Add an item to a specific ToDo list by ID")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Item added successfully"),
+            @ApiResponse(responseCode = "404", description = "ToDo list not found")})
     @PostMapping("/{id}")
     public ResponseEntity<String> addItemToList(@PathVariable Long id, @RequestBody ToDoListItemDto toDoListItemDto) throws NotFoundException {
         toDoListService.addItemToList(id, toDoListItemDto);

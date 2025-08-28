@@ -2,6 +2,12 @@ package web;
 
 import dto.ToDoListItemDto;
 import exception.NotFoundException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,50 +36,44 @@ public class ToDoListItemController {
         this.toDoListItemService = toDoListItemService;
     }
 
-    /**
-     * Get all items for a specific ToDoList by its ID.
-     *
-     * @param toDoListId the ID of the ToDoList
-     * @return a list of ToDoListItemDto
-     */
+
+
+    @Operation(summary = "Get all todolist item", description = "Get all todolist with todolist id")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Successfully retrieved all items for the ToDo list",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ToDoListItemDto.class)))),
+            @ApiResponse(responseCode = "404", description = "ToDo list not found")})
     @GetMapping("/todolist-item/{toDoListId}")
     public ResponseEntity<List<ToDoListItemDto>> getAllToDoListItem(@PathVariable Long toDoListId) {
         return ResponseEntity.ok(toDoListItemService.getAllToDoListItem(toDoListId));
     }
 
-    /**
-     * Create a new item for a specific ToDoList.
-     *
-     * @param toDoListItemDto DTO containing item data
-     * @param toDoListId      ID of the parent ToDoList
-     * @return ResponseEntity with HTTP status CREATED
-     * @throws NotFoundException if the parent ToDoList does not exist
-     */
+
+
+    @Operation(summary = "Create a new ToDoList item", description = "Creates a new item in the specified ToDo list")
+    @ApiResponses({@ApiResponse(responseCode = "201", description = "Item created successfully"),
+            @ApiResponse(responseCode = "404", description = "Parent ToDo list not found")})
     @PostMapping("/{toDoListId}")
     public ResponseEntity<Void> createItem(@RequestBody ToDoListItemDto toDoListItemDto, @PathVariable Long toDoListId) throws NotFoundException {
         toDoListItemService.createItem(toDoListItemDto, toDoListId);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    /**
-     * Delete an item by its ID.
-     *
-     * @param id the ID of the item
-     * @return ResponseEntity with HTTP status NO_CONTENT
-     */
+
+
+    @Operation(summary = "Delete an item", description = "Deletes the item with the specified ID")
+    @ApiResponses({@ApiResponse(responseCode = "204", description = "Item deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Item not found")})
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
         toDoListItemService.deleteItem(id);
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Toggle the "isDone" status of a ToDoListItem.
-     *
-     * @param id the ID of the item
-     * @return ResponseEntity with HTTP status OK
-     * @throws NotFoundException if the item does not exist
-     */
+
+
+    @Operation(summary = "Toggle item status", description = "Toggles the 'isDone' status of a ToDoList item")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Status updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Item not found")})
     @PatchMapping("/{id}/toggle-done")
     public ResponseEntity<Void> updateIsDone(@PathVariable Long id) throws NotFoundException {
         toDoListItemService.updateIsDone(id);
