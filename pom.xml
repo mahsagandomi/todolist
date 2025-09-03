@@ -16,8 +16,8 @@
     <groupId>org.example</groupId>
     <artifactId>springshop</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>springshop</name>
-    <description>springshop project</description>
+    <name>toDoList</name>
+    <description>toDoList project</description>
 
     <properties>
         <java.version>17</java.version> <!-- Java version -->
@@ -129,6 +129,7 @@
     </dependencies>
 
     <build>
+        <finalName>toDoList</finalName>
         <plugins>
             <!-- Compiler Plugin for Java version and annotation processing -->
             <plugin>
@@ -155,6 +156,19 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${project.parent.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 </project>
